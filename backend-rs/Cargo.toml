@@ -1,0 +1,58 @@
+[package]
+name = "openplace-backend"
+version = "1.0.0"
+edition = "2021"
+description = "openplace backend — Rust rewrite (Axum + SQLx + PostgreSQL)"
+default-run = "openplace-backend"
+
+[dependencies]
+axum = { version = "0.8", features = ["multipart"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["fs"] }
+sqlx = { version = "0.8", default-features = false, features = [
+    "runtime-tokio",
+    "tls-none",
+    "postgres",
+    "mysql",
+    "chrono",
+    "uuid",
+    "migrate",
+    "macros",
+    "json",
+] }
+chrono = { version = "0.4", features = ["serde"] }
+jsonwebtoken = "9"
+bcrypt = "0.15"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+rand = "0.8"
+base64 = "0.22"
+regex = "1"
+dashmap = "6"
+thiserror = "2"
+sha2 = "0.10"
+png = "0.17"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+pulldown-cmark = { version = "0.13", default-features = false, features = ["html"] }
+clap = { version = "4", features = ["derive"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+futures-util = "0.3"
+httpdate = "1"
+bytes = "1"
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-native-roots"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[[bin]]
+name = "openplace-backend"
+path = "src/main.rs"
+
+[[bin]]
+name = "loadgen"
+path = "src/bin/loadgen.rs"

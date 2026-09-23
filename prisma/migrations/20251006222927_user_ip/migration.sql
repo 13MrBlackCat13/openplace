@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE `User` ADD COLUMN `lastIP` VARCHAR(191) NULL,
-    ADD COLUMN `registrationIP` VARCHAR(191) NULL;

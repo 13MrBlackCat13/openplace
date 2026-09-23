@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE `Ticket` MODIFY `image` LONGBLOB NULL;
-
--- AlterTable
-ALTER TABLE `Tile` MODIFY `season` SMALLINT UNSIGNED NOT NULL DEFAULT 0;

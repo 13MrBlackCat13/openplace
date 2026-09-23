@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>openplace — Instance customization</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #0f1115; color: #e6e9ef;
+         font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 20px; }
+  h2 { font-size: 13px; margin: 0 0 10px; color: #9fb4d8;
+       text-transform: uppercase; letter-spacing: .07em; }
+  .card { background: #171a21; border: 1px solid #232833; border-radius: 10px;
+          padding: 16px 20px; max-width: 720px; margin-bottom: 18px; }
+  .row { display: flex; align-items: center; justify-content: space-between;
+         gap: 16px; padding: 9px 0; border-bottom: 1px solid #1f242e; }
+  .row:last-of-type { border-bottom: none; }
+  .label b { display: block; font-weight: 600; }
+  .label span { color: #8a93a6; font-size: 12.5px; }
+  .switch { position: relative; width: 42px; height: 24px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #2a3040; border-radius: 24px;
+            transition: .18s; cursor: pointer; }
+  .slider:before { content: ""; position: absolute; width: 18px; height: 18px;
+                   left: 3px; top: 3px; background: #aab2c5; border-radius: 50%; transition: .18s; }
+  .switch input:checked + .slider { background: #4f8cff; }
+  .switch input:checked + .slider:before { transform: translateX(18px); background: #fff; }
+  .field { margin-top: 14px; }
+  .field > label { display: block; font-weight: 600; margin-bottom: 6px; }
+  textarea, select, input[type=number] { background: #0f1115; color: #e6e9ef;
+          border: 1px solid #2a3040; border-radius: 8px; padding: 9px 11px; font: inherit; }
+  textarea { width: 100%; min-height: 90px; resize: vertical; }
+  select { width: 230px; }
+  input[type=number] { width: 140px; }
+  .hint { color: #8a93a6; font-size: 12.5px; margin-top: 6px; }
+  .mode-row { display: flex; gap: 18px; flex-wrap: wrap; }
+  button { background: #4f8cff; color: #fff; border: none; border-radius: 8px;
+           padding: 10px 22px; font: inherit; font-weight: 600; cursor: pointer; }
+  button:hover { background: #3d7bf0; }
+  button:disabled { opacity: .6; cursor: default; }
+  #toast { position: fixed; right: 20px; bottom: 20px; padding: 10px 18px;
+           border-radius: 8px; font-weight: 600; opacity: 0; transition: opacity .2s;
+           pointer-events: none; }
+  #toast.ok { background: #1d7a46; color: #fff; }
+  #toast.err { background: #b3352e; color: #fff; }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<h1>openplace — Instance customization</h1>
+
+<div class="card">
+  <h2>Community rules</h2>
+  <div class="row"><div class="label"><b>Multi-accounting allowed</b><span>Users may run several accounts on this instance.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_multi_account"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>Offensive content allowed</b><span>Insults and offensive language are tolerated.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_offensive_content"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>Explicit (18+) content allowed</b><span>Adult content may be drawn on the canvas.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_explicit_content"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>Griefing allowed</b><span>Deliberately ruining other players' art is permitted.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_griefing"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>Kind griefing allowed</b><span>Friendly, harmless griefing is permitted.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_kind_griefing"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>Political griefing allowed</b><span>Political flags and messaging are permitted.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_political_griefing"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>VPNs allowed</b><span>Users behind VPNs and proxies may play.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_vpn"><span class="slider"></span></label></div>
+  <div class="row"><div class="label"><b>Botting allowed</b><span>Automated painting clients are permitted.</span></div>
+    <label class="switch"><input type="checkbox" id="allow_bots"><span class="slider"></span></label></div>
+  <div class="field">
+    <label for="extra_rules">Extra rules (free text shown to users)</label>
+    <textarea id="extra_rules" maxlength="2000" placeholder="Anything else users should know about the rules..."></textarea>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Bot defense</h2>
+  <div class="mode-row">
+    <div class="field" style="margin-top:0;">
+      <label for="anti_bot_mode">Mode</label>
+      <select id="anti_bot_mode">
+        <option value="off">off</option>
+        <option value="log">log</option>
+        <option value="enforce">enforce</option>
+      </select>
+      <div class="hint" id="mode-hint"></div>
+    </div>
+    <div class="field" style="margin-top:0;">
+      <label for="anti_bot_enforce_threshold">Enforce threshold</label>
+      <input type="number" id="anti_bot_enforce_threshold" min="1" max="100000" step="1">
+      <div class="hint">Bot score (1–100000) that blocks painting in enforce mode.</div>
+    </div>
+  </div>
+</div>
+
+<button id="save">Save changes</button>
+<div id="toast"></div>
+
+<script>
+(() => {
+  "use strict";
+  const FIELDS = [
+    "allow_multi_account", "allow_offensive_content", "allow_explicit_content",
+    "allow_griefing", "allow_kind_griefing", "allow_political_griefing",
+    "allow_vpn", "allow_bots"
+  ];
+  const HINTS = {
+    off: "Anti-bot fully disabled: no fingerprinting, no scoring.",
+    log: "Fingerprinting and scoring run, but nobody is blocked.",
+    enforce: "Users above the threshold are blocked until they solve a PoW challenge."
+  };
+  const $ = (id) => document.getElementById(id);
+  const toast = (msg, ok) => {
+    const t = $("toast");
+    t.textContent = msg;
+    t.className = "show " + (ok ? "ok" : "err");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => { t.className = ""; }, 2600);
+  };
+  const updateHint = () => { $("mode-hint").textContent = HINTS[$("anti_bot_mode").value] || ""; };
+
+  async function load() {
+    try {
+      const res = await fetch("/admin/settings", { credentials: "same-origin" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const s = await res.json();
+      FIELDS.forEach((f) => { $(f).checked = !!s[f]; });
+      $("extra_rules").value = s.extra_rules || "";
+      $("anti_bot_mode").value = s.anti_bot_mode || "log";
+      $("anti_bot_enforce_threshold").value = s.anti_bot_enforce_threshold;
+      updateHint();
+    } catch (e) {
+      toast("Failed to load settings: " + e.message, false);
+    }
+  }
+
+  async function save() {
+    const body = {};
+    FIELDS.forEach((f) => { body[f] = $(f).checked; });
+    const extra = $("extra_rules").value;
+    body.extra_rules = extra === "" ? null : extra;
+    body.anti_bot_mode = $("anti_bot_mode").value;
+    body.anti_bot_enforce_threshold = parseInt($("anti_bot_enforce_threshold").value, 10);
+    const btn = $("save");
+    btn.disabled = true;
+    try {
+      const res = await fetch("/admin/settings", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        toast("Saved", true);
+      } else {
+        toast(data.error || ("HTTP " + res.status), false);
+      }
+    } catch (e) {
+      toast(e.message, false);
+    }
+    btn.disabled = false;
+  }
+
+  $("anti_bot_mode").addEventListener("change", updateHint);
+  $("save").addEventListener("click", save);
+  load();
+})();
+</script>
+</body>
+</html>

@@ -7,3 +7,9 @@
 dist/
 node_modules/
 .vscode/
+# Rust
+backend-rs/target/
+
+# Local env & data
+.env
+*.local

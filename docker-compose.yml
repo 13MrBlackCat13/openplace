@@ -1,38 +1,48 @@
+# openplace — Docker deployment (Rust backend + PostgreSQL).
+#
+#   docker compose up -d --build
+#
+# The `frontend/` directory is a git submodule (the wplace web client) that
+# the backend serves as static files — initialize it with:
+#   git submodule update --init --recursive
 services:
   db:
-    image: mariadb:12.0.2
+    image: postgres:17-alpine
     ports:
-      - 3306:3306
+      - 5432:5432
     environment:
-      - MARIADB_DATABASE=openplace
-      - MARIADB_ROOT_PASSWORD=password
+      - POSTGRES_DB=openplace
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d openplace"]
       interval: 10s
       timeout: 5s
       retries: 10
+
   app:
-    image: node:22-alpine
+    build: ./backend-rs
     env_file: ./.env
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/openplace
+      - BACKEND_PORT=3000
     volumes:
-      - .:/app
-    working_dir: /app
-    command: sh -c "
-      npm install &&
-      npx prisma migrate deploy &&
-      npx prisma generate &&
-      npx prisma db push &&
-      npm run dev
-      "
+      # Static frontend served by the backend itself.
+      - ./frontend:/app/frontend:ro
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      # Built-in probe: no curl/wget needed in the image.
+      test: ["CMD", "openplace-backend", "healthcheck"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 40s
+      start_period: 15s
+    restart: unless-stopped
+
   caddy:
     image: caddy:latest
     ports:
@@ -45,7 +55,8 @@ services:
       - BACKEND_HOST=app
       - BACKEND_PORT=3000
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -57,6 +68,9 @@ services:
     ports:
       - 127.0.0.1:3001:3000
     volumes:
-      - .:/app
-    working_dir: /app/frontend2
+      - ./frontend2:/app
+    working_dir: /app
     command: sh -c "CI=1 npx pnpm install && npx pnpm build && node .output/server/index.mjs"
+
+volumes:
+  pgdata:
