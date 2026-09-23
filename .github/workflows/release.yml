@@ -131,7 +131,7 @@ jobs:
       - name: Download all artifacts
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh run download ${{ github.run_id }} --dir dist
+        run: gh run download ${{ github.run_id }} --dir dist --pattern 'release-*'
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
