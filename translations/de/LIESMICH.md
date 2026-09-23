@@ -8,7 +8,7 @@
   <a href="https://github.com/13MrBlackCat13/openplace/blob/main/LICENSE.md"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
 </p>
 
-<p align="center"><strong>Translations</strong> v7.0</p>
+<p align="center"><strong>Translations</strong> v7.1</p>
 <p align="center">
     <a href="../../README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="United States Flag"></a>
 
@@ -328,15 +328,14 @@ Fairness-Hinweise: Der Bestenlisten-Endpunkt ist durch dasselbe Aggregat-SQL beg
 
 ## Übersetzung hinzufügen
 
-> [WARNUNG ⚠️]
-> Beiträge, die mit KI erstellt wurden, werden abgelehnt, und Sie werden **mit Sicherheit** aus dem Repository gebannt. Sie müssen die Sprache, in die Sie übersetzen, fließend beherrschen.
+Übersetzungen sind herzlich willkommen — auch KI-unterstützte! Maschinelle Übersetzungen sind als Ausgangspunkt völlig in Ordnung, und Durchsichten oder Verbesserungen durch Muttersprachler werden immer geschätzt.
 
-Um zu diesem Repository beizutragen und die `README.md` sowie weitere Installationsdateien zu übersetzen, befolgen Sie bitte diese Schritte.
+Um eine neue Sprache hinzuzufügen oder eine bestehende Übersetzung der `README.md` und der Installationsanleitungen aufzufrischen, befolgen Sie bitte diese Schritte.
 
 ### Die Versionsnummer am oberen Rand dieses READMEs ändern, um anzuzeigen, dass eine neue Sprache hinzugefügt wurde
 
-Die Versionsnummer hat das Format `X.XX`, wobei das erste „X“ für die Anzahl der bisher offiziell übersetzten Sprachen steht. Die zweite Gruppe von „X“-Zeichen nach dem Punkt wird geändert, sobald Anpassungen an der englischen Version des READMEs vorgenommen werden.
-Diese Versionsnummer hilft Übersetzern zu erkennen, wann sie ihre bereits übersetzten Inhalte aktualisieren müssen.
+Die Versionsnummer hat das Format `X.XX`, wobei das erste „X“ für die Anzahl der bisher offiziell übersetzten Sprachen steht. Die zweite „X“ nach dem Punkt wird geändert, sobald Anpassungen an der englischen Version des READMEs vorgenommen werden.
+Diese Versionsnummer hilft Übersetzern zu erkennen, wann ihre Übersetzung aktualisiert werden muss.
 
 ### Einen neuen Ordner im Verzeichnis `translations` mit dem ISO-Code Ihrer Sprache anlegen
 
@@ -344,7 +343,7 @@ Wenn Sie nicht sicher sind, wie Ihr ISO-Code lautet, können Sie ihn [hier](http
 
 ### Die englischen Dateien in Ihren neuen Ordner kopieren
 
-Kopieren Sie die englischen Dateien aus dem Ordner `translations` und die Haupt-`README.md` in den soeben erstellten Ordner.
+Kopieren Sie die englischen Dateien aus dem Ordner `translations/en` und die Haupt-`README.md` in den soeben erstellten Ordner.
 Sie sollten nun vier Dateien besitzen: `README.md` und drei Installations-Markdown-Dateien (`.md`).
 
 ### Die richtige Flagge in beiden READMEs ergänzen
@@ -368,7 +367,7 @@ Ersetzen Sie die Platzhalter durch den ISO-Code und den Ländernamen Ihrer Über
 
 Fügen Sie oben in Ihrem übersetzten README **nur die amerikanische Flagge** hinzu, die zurück auf das englische README verlinkt.
 
-> [WARNUNG ⚠️]
+> [HINWEIS]
 > Die Flaggen im englischen README müssen alphabetisch nach ISO-Code sortiert bleiben.
 
 ### Links im Abschnitt „Erste Schritte“ aktualisieren
@@ -376,18 +375,11 @@ Fügen Sie oben in Ihrem übersetzten README **nur die amerikanische Flagge** hi
 Aktualisieren Sie im Abschnitt **Erste Schritte** die Links so, dass sie auf Ihre übersetzten Dateien verweisen.
 Wenn Sie unsicher sind, wie das geht, orientieren Sie sich an einem anderen Sprachordner (zum Beispiel `fr`).
 
-### Alle Dateien übersetzen
+### Die Dateien übersetzen
 
-Übersetzen Sie alle Dateien vollständig und korrekt.
-Wenn Sie fertig sind, erstellen Sie einen Pull-Request. Ein Beitragender oder Nutzer wird Ihre Arbeit prüfen.
-**Nicht vergessen:** Die Verwendung von KI ist strengstens untersagt und führt bei Entdeckung zu einem dauerhaften Bann.
+Übersetzen Sie den Inhalt und behalten Sie dabei die Struktur bei: Code-Blöcke, Namen von Umgebungsvariablen, Endpunkte und Dateinamen bleiben auf Englisch. Bevor Sie Ihren Pull-Request öffnen, klicken Sie **jeden** Link und jede Flagge durch, um sicherzustellen, dass alles funktioniert.
 
-### Ihre Arbeit überprüfen
-
-Klicken Sie auf **JEDEN** Link und jede Flagge. Jeder davon muss korrekt funktionieren und zur passenden Datei oder Website führen.
-Wenn etwas nicht funktioniert, beheben Sie es, bevor Sie Ihren Pull-Request einreichen.
-Sobald alles wie erwartet funktioniert, können Sie Ihren Pull-Request bedenkenlos öffnen.
-Denken Sie daran: Diese Richtlinien werden bei allen Übersetzungen überprüft, um volle Einhaltung sicherzustellen.
+Sobald alles gut aussieht, öffnen Sie Ihren Pull-Request — vielen Dank! 💙
 
 ## Lizenz
 

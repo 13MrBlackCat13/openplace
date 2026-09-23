@@ -8,7 +8,7 @@
   <a href="../../LICENSE.md"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
 </p>
 
-<p align="center"><strong>Translations</strong> v7.0</p>
+<p align="center"><strong>Translations</strong> v7.1</p>
 <p align="center">
     <a href="../../README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="United States Flag"></a>
 
@@ -318,15 +318,14 @@ Notes d’équité : l’endpoint de classement est borné par le même SQL d’
 
 ## Ajouter une traduction
 
-> [AVERTISSEMENT ⚠️]
-> Les contributions réalisées à l’aide de l’IA seront rejetées, et vous **SEREZ** banni du dépôt. Vous devez maîtriser la langue que vous traduisez.
+Les traductions sont très bienvenues — y compris celles assistées par l’IA ! Les traductions machine constituent un excellent point de départ, et les relectures ou améliorations apportées par des locuteurs natifs sont toujours appréciées.
 
-Pour contribuer à ce dépôt et traduire le `README.md` ainsi que les autres fichiers d’installation, veuillez suivre les étapes ci-dessous.
+Pour ajouter une nouvelle langue ou actualiser une traduction existante du `README.md` et des guides d’installation, veuillez suivre les étapes ci-dessous.
 
 ### Modifier le numéro de version en haut de ce README pour indiquer qu’une nouvelle langue a été ajoutée
 
-Le numéro de version est au format `X.XX`, où le premier « X » représente le nombre de langues officiellement traduites à ce jour. Le second ensemble de « X » après le point change chaque fois qu’une modification est apportée à la version anglaise du README.
-Ce numéro de version aide les traducteurs à savoir quand ils doivent mettre à jour leur contenu traduit existant.
+Le numéro de version est au format `X.XX`, où le premier « X » représente le nombre de langues officiellement traduites à ce jour. Le second « X » après le point change chaque fois qu’une modification est apportée à la version anglaise du README.
+Ce numéro de version aide les traducteurs à savoir quand leur traduction doit être mise à jour.
 
 ### Créer un nouveau dossier dans le répertoire `translations` nommé d’après le code ISO de votre langue
 
@@ -334,8 +333,8 @@ Si vous ne connaissez pas votre code ISO, vous pouvez le vérifier [ici](https:/
 
 ### Copier les fichiers anglais dans votre nouveau dossier
 
-Copiez les fichiers anglais du dossier `translations` ainsi que le `README.md` principal dans le dossier que vous venez de créer.
-Vous devriez maintenant avoir quatre fichiers : le `README.md` et trois fichiers d’installation au format markdown (`.md`).
+Copiez les fichiers anglais du dossier `translations/en` ainsi que le `README.md` principal dans le dossier que vous venez de créer.
+Vous devriez maintenant avoir quatre fichiers : le `README.md` et trois guides d’installation au format markdown (`.md`).
 
 ### Ajouter le drapeau approprié aux deux README
 
@@ -349,7 +348,7 @@ Ce drapeau doit pointer vers votre nouveau README traduit.
 Utilisez ce modèle :
 
 ```html
-<a href="translations/LANGUAGE_ISO_CODE/NAME_OF_YOUR_README.md"><img src="https://flagcdn.com/256x192/LANGUAGE_ISO_CODE.png" width="48" alt="Drapeau de NAME_OF_COUNTRY"></a>
+<a href="translations/LANGUAGE_ISO_CODE/NAME_OF_YOUR_README.md"><img src="https://flagcdn.com/256x192/LANGUAGE_ISO_CODE.png" width="48" alt="NAME_OF_COUNTRY Flag"></a>
 ```
 
 Remplacez les champs réservés par le code ISO et le nom du pays de votre traduction.
@@ -358,7 +357,7 @@ Remplacez les champs réservés par le code ISO et le nom du pays de votre tradu
 
 En haut de votre README traduit, ajoutez **uniquement le drapeau américain**, qui renvoie vers le README anglais.
 
-> [AVERTISSEMENT ⚠️]
+> [REMARQUE]
 > Les drapeaux dans le README anglais doivent rester classés par ordre alphabétique selon leur code ISO.
 
 ### Mettre à jour les liens dans la section Démarrage
@@ -366,18 +365,12 @@ En haut de votre README traduit, ajoutez **uniquement le drapeau américain**, q
 Dans la section **Démarrage**, mettez à jour les liens afin qu’ils pointent vers vos fichiers traduits.
 Si vous ne savez pas comment faire, consultez un autre dossier de langue (par exemple, `fr`).
 
-### Traduire tous les fichiers
+### Traduire les fichiers
 
-Traduisez tous les fichiers complètement et avec précision.
-Une fois terminé, créez une pull request. Un contributeur ou un utilisateur vérifiera votre travail.
-**N’oubliez pas :** l’utilisation de l’IA est strictement interdite et entraînera un bannissement permanent si elle est détectée.
+Traduisez le contenu en conservant la structure : les blocs de code, les noms de variables d’environnement, les endpoints et les noms de fichiers restent en anglais.
+Avant d’ouvrir votre pull request, cliquez sur **tous** les liens et drapeaux pour vérifier que tout fonctionne.
 
-### Vérifier votre travail
-
-Cliquez sur **TOUS** les liens et drapeaux. Chacun doit fonctionner correctement et mener au fichier ou au site approprié.
-Si quelque chose ne fonctionne pas, corrigez-le avant de soumettre votre pull request.
-Une fois que tout fonctionne comme prévu, vous pouvez ouvrir votre pull request en toute confiance.
-Souvenez-vous : ces directives seront vérifiées pour toutes les traductions afin d’assurer une conformité totale.
+Une fois que tout est bon, ouvrez votre pull request — merci ! 💙
 
 ## Licence
 

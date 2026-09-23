@@ -8,7 +8,7 @@
   <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
 </p>
 
-<p align="center"><strong>Translations</strong> v7.0</p>
+<p align="center"><strong>Translations</strong> v7.1</p>
 <p align="center">
     <a href="translations/de/LIESMICH.md"><img src="https://flagcdn.com/256x192/de.png" width="48" alt="German Flag"></a>
     <a href="translations/fr/LISEZMOI.md"><img src="https://flagcdn.com/256x192/fr.png" width="48" alt="French Flag"></a>
@@ -339,33 +339,43 @@ Fairness notes: the leaderboard endpoint is bounded by the same aggregate SQL bo
 
 ## Adding a translation
 
-> [WARNING ⚠️]
-> Contributions made with AI will be rejected, and you **WILL** be banned from the repository. You must be proficient in the language you translate.
+Translations are very welcome — including AI-assisted ones! Machine
+translations are a perfectly fine starting point, and reviews or improvements
+by native speakers are always appreciated.
 
-To contribute to this repository and translate the `README.md` and other installation files, please follow these steps.
+To add a new language or refresh an existing translation of the `README.md`
+and the installation guides, please follow these steps.
 
 ### Change the version number at the top of this README to indicate a new language has been added
 
-The version number is formatted as `X.XX`, where the first "X" represents the number of languages officially translated so far. The second set of "X"s after the period is changed whenever any modifications are made to the English version of the README.
-This version number helps translators know when they need to update their existing translated content.
+The version number is formatted as `X.XX`, where the first "X" represents the
+number of languages officially translated so far. The second "X" after the
+period is changed whenever any modifications are made to the English version
+of the README. This version number helps translators know when their
+translation needs an update.
 
 ### Create a new folder in the `translations` directory named after your language’s ISO code
 
-If you’re unsure what your ISO code is, you can check it [here](https://gist.githubusercontent.com/josantonius/b455e315bc7f790d14b136d61d9ae468/raw/416def351bc1f790d14b136d61d9ae468/language-codes.json) or simply search online. You are looking for a two-letter code such as `"en"` for English.
+If you’re unsure what your ISO code is, you can check it
+[here](https://gist.githubusercontent.com/josantonius/b455e315bc7f790d14b136d61d9ae468/raw/416def351bc1f790d14b136d61d9ae468/language-codes.json)
+or simply search online. You are looking for a two-letter code such as `"en"`
+for English.
 
 ### Copy the English files into your new folder
 
-Copy the English files from the `translations` folder and the main `README.md` into the folder you just created.
-You should now have four files: `README.md` and three installation markdown (`.md`) files.
+Copy the English files from the `translations/en` folder and the main
+`README.md` into the folder you just created.
+You should now have four files: `README.md` and three installation markdown
+(`.md`) files.
 
-### Add the correct flag to both README
+### Add the correct flag to both READMEs
 
 When creating a new translation, you must update **two** README files:
 
 #### 1. **Original English README**
 
-Add **only the flag of the country/language you are translating into** at the top.
-This flag must link to your new translated README.
+Add **only the flag of the country/language you are translating into** at the
+top. This flag must link to your new translated README.
 
 Use this template:
 
@@ -373,32 +383,31 @@ Use this template:
 <a href="translations/LANGUAGE_ISO_CODE/NAME_OF_YOUR_README.md"><img src="https://flagcdn.com/256x192/LANGUAGE_ISO_CODE.png" width="48" alt="NAME_OF_COUNTRY Flag"></a>
 ```
 
-Replace the placeholders with the ISO code and country name for your translation.
+Replace the placeholders with the ISO code and country name for your
+translation.
 
 #### 2. **Your Translated README**
 
-At the top of your translated README, add **only the American flag**, linking back to the English README.
+At the top of your translated README, add **only the American flag**, linking
+back to the English README.
 
-> [WARNING ⚠️]
+> [NOTE]
 > Flags in the English README must stay in alphabetical order by ISO code.
 
 ### Update links in the Getting Started section
 
-In the **Getting Started** section, update the links so they point to your translated files.
-If you’re unsure how to do this, refer to another language folder (for example, `fr`).
+In the **Getting Started** section, update the links so they point to your
+translated files. If you’re unsure how to do this, refer to another language
+folder (for example, `fr`).
 
-### Translate all files
+### Translate the files
 
-Translate all the files completely and accurately.
-Once you’ve finished, make a pull request. A contributor or user will verify your work.
-**Do not forget:** the use of AI is strictly prohibited and will result in a permanent ban if detected.
+Translate the content and keep the structure: code blocks, environment
+variable names, endpoints and file names stay in English. Before opening your
+pull request, click through **every** link and flag to make sure everything
+works.
 
-### Verify your work
-
-Click on **EVERY** link and flag. Each one must work correctly and lead to the appropriate file or website.
-If something doesn't work out, fix it before submitting your pull request.
-Once everything functions as expected, you can confidently open your pull request.
-Remember: these guidelines will be reviewed for all translations to ensure full compliance.
+Once everything looks good, open your pull request — thank you! 💙
 
 ## License
 

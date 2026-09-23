@@ -8,7 +8,7 @@
   <a href="../../LICENSE.md"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
 </p>
 
-<p align="center"><strong>Terjemahan</strong> v7.0</p>
+<p align="center"><strong>Terjemahan</strong> v7.1</p>
 <p align="center">
     <a href="../../README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="United States Flag"></a>
 
@@ -353,15 +353,13 @@ Catatan keadilan: endpoint papan peringkat dibatasi oleh SQL agregasi yang sama 
 
 ## Menambahkan terjemahan
 
-> [PERINGATAN ⚠️]
-> Kontribusi yang dibuat dengan AI akan ditolak, dan Anda **AKAN** di-ban dari repositori ini. Anda harus menguasai bahasa yang Anda terjemahkan.
+Terjemahan sangat kami sambut — termasuk yang dibuat dengan bantuan AI! Terjemahan mesin adalah titik awal yang sama sekali tidak masalah, dan peninjauan atau perbaikan dari penutur asli selalu kami hargai.
 
-Untuk berkontribusi pada repositori ini dan menerjemahkan `README.md` beserta file instalasi lainnya, silakan ikuti langkah-langkah berikut.
+Untuk menambahkan bahasa baru atau menyegarkan terjemahan yang sudah ada untuk `README.md` beserta panduan instalasi, silakan ikuti langkah-langkah berikut.
 
 ### Ubah nomor versi di bagian atas README ini untuk menandakan bahwa bahasa baru telah ditambahkan
 
-Nomor versi diformat sebagai `X.XX`, di mana "X" pertama mewakili jumlah bahasa yang telah diterjemahkan secara resmi sejauh ini. Kumpulan "X" kedua setelah titik diubah setiap kali ada modifikasi pada versi bahasa Inggris dari README.
-Nomor versi ini membantu penerjemah mengetahui kapan mereka perlu memperbarui konten terjemahan yang sudah ada.
+Nomor versi diformat sebagai `X.XX`, di mana "X" pertama mewakili jumlah bahasa yang telah diterjemahkan secara resmi sejauh ini. "X" kedua setelah titik diubah setiap kali ada modifikasi pada versi bahasa Inggris dari README. Nomor versi ini membantu penerjemah mengetahui kapan terjemahan mereka perlu diperbarui.
 
 ### Buat folder baru di direktori `translations` yang dinamai sesuai kode ISO bahasa Anda
 
@@ -369,7 +367,7 @@ Jika Anda tidak yakin apa kode ISO Anda, Anda dapat memeriksanya [di sini](https
 
 ### Salin file bahasa Inggris ke folder baru Anda
 
-Salin file bahasa Inggris dari folder `translations` dan `README.md` utama ke folder yang baru saja Anda buat.
+Salin file bahasa Inggris dari folder `translations/en` dan `README.md` utama ke folder yang baru saja Anda buat.
 Sekarang Anda seharusnya memiliki empat file: `README.md` dan tiga file markdown instalasi (`.md`).
 
 ### Tambahkan bendera yang benar ke kedua README
@@ -393,7 +391,7 @@ Ganti placeholder dengan kode ISO dan nama negara untuk terjemahan Anda.
 
 Di bagian atas README terjemahan Anda, tambahkan **hanya bendera Amerika**, yang menautkan kembali ke README bahasa Inggris.
 
-> [PERINGATAN ⚠️]
+> [CATATAN]
 > Bendera di README bahasa Inggris harus tetap dalam urutan abjad berdasarkan kode ISO.
 
 ### Perbarui tautan di bagian Memulai
@@ -401,18 +399,11 @@ Di bagian atas README terjemahan Anda, tambahkan **hanya bendera Amerika**, yang
 Di bagian **Memulai**, perbarui tautan agar menunjuk ke file terjemahan Anda.
 Jika Anda tidak yakin bagaimana melakukannya, lihat folder bahasa lain (misalnya, `fr`).
 
-### Terjemahkan semua file
+### Terjemahkan file
 
-Terjemahkan semua file secara lengkap dan akurat.
-Setelah selesai, buat pull request. Seorang kontributor atau pengguna akan memverifikasi pekerjaan Anda.
-**Jangan lupa:** penggunaan AI sangat dilarang dan akan mengakibatkan ban permanen jika terdeteksi.
+Terjemahkan kontennya dan pertahankan strukturnya: blok kode, nama variabel environment, endpoint, dan nama file tetap dalam bahasa Inggris. Sebelum membuka pull request Anda, klik **setiap** tautan dan bendera untuk memastikan semuanya berfungsi.
 
-### Verifikasi pekerjaan Anda
-
-Klik **SETIAP** tautan dan bendera. Masing-masing harus berfungsi dengan benar dan mengarah ke file atau situs web yang sesuai.
-Jika ada yang tidak berfungsi, perbaiki sebelum mengirimkan pull request Anda.
-Setelah semuanya berfungsi seperti yang diharapkan, Anda dapat dengan percaya diri membuka pull request Anda.
-Ingat: panduan ini akan ditinjau untuk semua terjemahan guna memastikan kepatuhan penuh.
+Setelah semuanya terlihat baik, buka pull request Anda — terima kasih! 💙
 
 ## Lisensi
 

@@ -8,7 +8,7 @@
   <a href="../../LICENSE.md"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
 </p>
 
-<p align="center"><strong>Translations</strong> v7.0</p>
+<p align="center"><strong>Translations</strong> v7.1</p>
 <p align="center">
 	<a href="../../README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="United States Flag"></a>
 
@@ -322,23 +322,22 @@ Ghi chú về tính công bằng: endpoint bảng xếp hạng bị chặn bởi
 
 ## Thêm bản dịch
 
-> [CẢNH BÁO ⚠️]
-> Các đóng góp có sử dụng AI sẽ bị từ chối, và bạn **SẼ** bị cấm khỏi repo này. Bạn phải thành thạo ngôn ngữ mà bạn dịch.
+Chúng tôi rất hoan nghênh các bản dịch — kể cả những bản dịch có sự hỗ trợ của AI! Bản dịch máy là một điểm khởi đầu hoàn toàn hợp lệ, còn những góp ý hoặc cải tiến từ người bản ngữ luôn được ghi nhận.
 
-Để đóng góp vào repo này và dịch `README.md` cùng các file cài đặt khác, vui lòng làm theo các bước sau.
+Để thêm một ngôn ngữ mới hoặc làm mới một bản dịch hiện có cho `README.md` và các hướng dẫn cài đặt, vui lòng làm theo các bước sau.
 
 ### Thay đổi số phiên bản ở đầu README này để chỉ ra rằng một ngôn ngữ mới đã được thêm
 
 Số phiên bản được định dạng dưới dạng `X.XX`, trong đó chữ "X" đầu tiên đại diện cho số lượng ngôn ngữ đã được dịch chính thức tính đến nay. Bộ chữ "X" thứ hai sau dấu chấm được thay đổi mỗi khi bản tiếng Anh của README có bất kỳ chỉnh sửa nào.
-Số phiên bản này giúp người dịch biết khi nào họ cần cập nhật nội dung bản dịch hiện có của mình.
+Số phiên bản này giúp người dịch biết khi nào bản dịch của họ cần được cập nhật.
 
 ### Tạo một thư mục mới trong thư mục `translations` đặt tên theo mã ISO của ngôn ngữ của bạn
 
-Nếu bạn không chắc mã ISO của mình là gì, bạn có thể kiểm tra [tại đây](https://gist.githubusercontent.com/josantonius/b455e315bc7f790d14b136d61d9ae468/raw/416def351bc1f790d14b136d61d9ae468/language-codes.json) hoặc đơn giản là tìm kiếm trên mạng. Bạn cần tìm một mã gồm hai chữ cái, ví dụ như `"vi"` cho tiếng Việt.
+Nếu bạn không chắc mã ISO của mình là gì, bạn có thể kiểm tra [tại đây](https://gist.githubusercontent.com/josantonius/b455e315bc7f790d14b136d61d9ae468/raw/416def351bc1f790d14b136d61d9ae468/language-codes.json) hoặc đơn giản là tìm kiếm trên mạng. Bạn cần tìm một mã gồm hai chữ cái, ví dụ như `"en"` cho tiếng Anh.
 
 ### Sao chép các file tiếng Anh vào thư mục mới của bạn
 
-Sao chép các file tiếng Anh từ thư mục `translations` và file `README.md` chính vào thư mục bạn vừa tạo.
+Sao chép các file tiếng Anh từ thư mục `translations/en` và file `README.md` chính vào thư mục bạn vừa tạo.
 Lúc này bạn sẽ có bốn file: `README.md` và ba file markdown (`.md`) hướng dẫn cài đặt.
 
 ### Thêm đúng cờ vào cả hai README
@@ -362,26 +361,19 @@ Thay các chỗ giữ chỗ bằng mã ISO và tên quốc gia cho bản dịch 
 
 Ở đầu README đã dịch của bạn, chỉ thêm **lá cờ Mỹ**, liên kết ngược về README tiếng Anh.
 
-> [CẢNH BÁO ⚠️]
+> [LƯU Ý]
 > Các lá cờ trong README tiếng Anh phải được giữ theo thứ tự bảng chữ cái dựa theo mã ISO.
 
 ### Cập nhật các liên kết trong phần Bắt đầu
 
 Trong phần **Bắt đầu**, cập nhật các liên kết để chúng trỏ đến các file đã dịch của bạn.
-Nếu bạn không biết cách làm, hãy tham khảo một thư mục ngôn ngữ khác (ví dụ như `fr`).
+Nếu bạn không chắc cách làm, hãy tham khảo một thư mục ngôn ngữ khác (ví dụ như `fr`).
 
-### Dịch tất cả các file
+### Dịch các file
 
-Dịch toàn bộ các file một cách đầy đủ và chính xác.
-Khi đã hoàn tất, hãy tạo một pull request. Một người đóng góp hoặc người dùng sẽ xác minh công việc của bạn.
-**Đừng quên:** việc sử dụng AI bị nghiêm cấm tuyệt đối và sẽ dẫn đến lệnh cấm vĩnh viễn nếu bị phát hiện.
+Dịch nội dung và giữ nguyên cấu trúc: các khối code, tên biến môi trường, endpoint và tên file giữ nguyên tiếng Anh. Trước khi mở pull request, hãy nhấn vào **tất cả** các liên kết và lá cờ để đảm bảo mọi thứ hoạt động.
 
-### Kiểm tra công việc của bạn
-
-Nhấn vào **TẤT CẢ** các liên kết và lá cờ. Mỗi cái phải hoạt động chính xác và dẫn đến file hoặc trang web phù hợp.
-Nếu có gì đó không hoạt động đúng, hãy sửa nó trước khi gửi pull request.
-Khi mọi thứ hoạt động như mong đợi, bạn có thể tự tin mở pull request của mình.
-Hãy nhớ rằng: các hướng dẫn này sẽ được xem xét lại đối với tất cả các bản dịch để đảm bảo tuân thủ đầy đủ.
+Khi mọi thứ trông đã ổn, hãy mở pull request của bạn — cảm ơn bạn! 💙
 
 ## Giấy phép
 

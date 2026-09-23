@@ -58,5 +58,5 @@ issue.
 ## Translations
 
 See the [translation section in the README](README.md#adding-a-translation).
-Note the project policy there: translation contributions made with AI are
-rejected.
+AI-assisted translations are welcome — see the README for the
+translation workflow and versioning conventions.
