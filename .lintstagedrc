@@ -1,4 +1,0 @@
-{
-	"{src,scripts}/**/*.{js,ts,jsx,tsx}": "npm exec -- eslint --fix",
-	"*.prisma": "npm exec -- prisma format"
-}
