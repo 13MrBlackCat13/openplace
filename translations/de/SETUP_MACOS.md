@@ -1,100 +1,101 @@
-# openplace - Installationsanweisungen unter macOS
+# openplace — Installation aus dem Quellcode (macOS)
 
-Diese Anweisungen helfen Ihnen, ein **macOS**-Gerät für die Ausführung von **openplace** vorzubereiten.
-
----
-
-## Schritt 1: Installationsvoraussetzungen
-Folgene Anwendungen werden benötigt:
-- **Homebrew**
-- **Node.js**
-- **Git**
+Diese Anweisungen helfen Ihnen, **openplace** unter macOS direkt aus dem Quellcode zu bauen und zu starten.
 
 ---
 
-## Schritt 2: Die Repository klonen
+## 1. Installationsvoraussetzungen
+
+-   **Homebrew** ([brew.sh](https://brew.sh))
+-   **Rust** 1.85 oder neuer — über [rustup.rs](https://rustup.rs/) installieren:
+
 ```bash
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+-   **PostgreSQL** 15 oder neuer (17 empfohlen):
+
+```bash
+brew install postgresql@17
+brew services start postgresql@17
+```
+
+oder alternativ Docker (siehe Schritt 3)
+
+> [HINWEIS]
+> Nach der Rust-Installation ein **neues** Terminal öffnen (oder `source "$HOME/.cargo/env"` ausführen), damit `cargo` gefunden wird.
+
+---
+
+## 2. Die Repository klonen
+
+```bash
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
 ---
 
-## Schritt 3: Abhängigkeiten installieren
+## 3. Die Datenbank vorbereiten
+
+Entweder eine lokale Datenbank anlegen:
+
 ```bash
-npm i && brew install mariadb caddy nss
+createdb openplace
 ```
-Falls Brew die Dienste nicht automatisch startet, dies ausführen:
+
+oder PostgreSQL über Docker starten:
+
 ```bash
-brew services start mariadb
-brew services start caddy
+docker run -d --name openplace-pg \
+  -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
 ```
 
 ---
 
-## Schritt 4: Die Datenbank konfigurieren und erstellen
+## 4. Die Umgebung konfigurieren
 
-Das `secure_installation` Skript für MySQL ausführen:
-```bash
-sudo mysql_secure_installation
-```
-
-Folgene Fragen beantworten:
-1. **Enter** für das jetzige Root-Passwort eingeben.
-2. **`n`** eingeben, wenn nach Wechsel zur unix_socket Authentifizierung gefragt wird.
-3. **`y`** eingeben, um das Root-Passwort zu ändern.
-   ⚠️ **Nicht** "password" wie in der Demo gezeigt verwenden.
-4. **`y`** eingeben, um anonyme Nutzer zu entfernen.
-5. **`y`** eingeben, falls Remote-Root-Logins deaktiviert werden sollen (**empfohlen: y, sonst n**).
-6. **`y`** eingeben, um die Test-Datenbank zu entfernen.
-7. **`y`** eingeben, um die Konfiguration neuzuladen.
-
-Anschließend die Umgebung konfigurieren:
 ```bash
 cp .env.example .env
 ```
-Die `.env` Datei mit dem ausgewähltem MySQL-Passwort aktualisieren.
 
----
+Die `.env`-Datei bearbeiten und mindestens setzen:
 
-## Schritt 5: Datenbank aufsetzen
+-   `DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"`
+-   `JWT_SECRET` auf eine lange, zufällige Zeichenkette
 
-Folgene Prisma-Befehle ausfüren:
+Alternativ (oder zusätzlich) lassen sich Variablen für die aktuelle Terminal-Sitzung direkt setzen:
+
 ```bash
-npm run db:generate
-npm run setup
+export DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+export JWT_SECRET="bitte-lange-zufaellige-zeichenkette-einsetzen"
+export FRONTEND_DIR="../frontend"
 ```
+
+> [WICHTIG]
+> `export` gilt nur für die aktuelle Sitzung. Dauerhaft gehört die Konfiguration in die `.env`-Datei.
 
 ---
 
-## Schritt 6: Die Applikation starten
+## 5. Bauen und starten
 
-Den Dev-Server ausführen:
 ```bash
-npm run dev
+cd backend-rs
+
+cargo run --release -- setup                            # Migrationen + Systemnutzer anlegen
+cargo run --release -- import-geonames cities1000.zip   # Regionsdaten importieren (siehe README)
+cargo run --release -- serve                            # HTTP-API auf BACKEND_PORT (Standard 3000)
 ```
 
-In einem anderen Terminal Caddy ausführen:
-```bash
-caddy run --config Caddyfile
-```
+> [HINWEIS]
+> Der Server liefert das statische Frontend aus `FRONTEND_DIR` aus. Wird er aus `backend-rs/` gestartet, muss `FRONTEND_DIR=../frontend` gesetzt sein (siehe Schritt 4).
 
 ---
 
-## SSL
-Openplace **braucht HTTPS**.  
-If you are testing locally, you can access the app at:
-Beim lokalen Testen kann man auf die App hier zugreifen:
-```
-https://{IP}:8080
-```
-⚠️ Beim Versuch, sich mit HTTP zu verbinden, kommt es zu einem **HTTP 400 Bad Request** Fehler.
+## 6. Auf die Anwendung zugreifen
 
----
+-   API: `http://localhost:3000`
+-   Frontend: über denselben Port ausgeliefert (statisch aus `frontend/`)
 
-## Die Datenbank aktualisieren
-Falls sich das Schema ändert, folgendes ausführen:
-
-```powershell
-npm run db:push
-```
+Für den Produktionseinsatz Caddy als Reverse Proxy mit TLS vorschalten (siehe Haupt-README, Abschnitt „Schnellstart (Docker)“).

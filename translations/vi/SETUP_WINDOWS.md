@@ -1,135 +1,113 @@
-# openplace — Hướng dẫn thiết lập với Windows
+# openplace — Hướng dẫn cài đặt cho Windows
 
-Hướng dẫn này sẽ giúp bạn chuẩn bị một thiết bị **Windows** để chạy **openplace**.
+Hướng dẫn này sẽ giúp bạn chuẩn bị một máy **Windows** để chạy **openplace** từ mã nguồn (backend Rust).
 
 ---
 
-## 1. Cài đặt trước hết
+## 1. Cài đặt các yêu cầu trước
 
-Bạn cần **Node.js**, **Git**, **MariaDB**, **Caddy**.
+Bạn cần **Rust**, **Git** và **PostgreSQL 15+** (khuyến nghị 17).
 
-- Sử dụng **winget** (Windows 10/11 PowerShell với quyền Quản trị):
+- Cài **rustup** (Rust 1.85+) — dùng **winget** (Windows 10/11 PowerShell với quyền Quản trị) hoặc tải từ [rustup.rs](https://rustup.rs/):
+
+```powershell
+winget install Rustlang.Rustup
+```
+
+- Cài **Git**:
 
 ```powershell
 winget install Git.Git
-winget install OpenJS.NodeJS.LTS
-winget install CaddyServer.Caddy
-winget install nssm
 ```
 
-- Sử dụng **Chocolatey** (cmd với quyền Quản trị):
+- **PostgreSQL**: cài từ [postgresql.org](https://www.postgresql.org/download/windows/), hoặc chạy bằng Docker:
 
-```cmd
-choco install git nodejs-lts caddy nssm -y
+```powershell
+docker run -d --name openplace-pg `
+  -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres `
+  -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
 ```
 
-- Tải MariaDB Server theo liên kết sau: [MariaDB Server](https://mirror.mva-n.net/mariadb///mariadb-12.0.2/winx64-packages/mariadb-12.0.2-winx64.msi)
-- Chạy Trình cài đặt
-- Đặt một mật khẩu gốc và giữ mọi thứ theo mặc định
-  
 ---
 
 ## 2. Sao chép repo
 
 ```powershell
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
----
-
-## 3. Cài đặt các phần phụ thuộc của Node
-
-```powershell
-npm install
-npm install -g pm2
-```
+> [LƯU Ý]
+> `--recurse-submodules` là bắt buộc: frontend Nuxt là một git submodule.
 
 ---
 
-## 4 Dừng các dịch vụ Caddy (cần thiết nếu được cài đặt dưới dạng dịch vụ)
+## 3. Cấu hình môi trường
 
-- Nếu Caddy được cài đặt dưới dạng dịch vụ, dừng nó bằng **Services.msc**  
-- Hoặc tự làm:
-
-```powershell
-net stop caddy
-```
-
----
-
-## 5. Cấu hình và xây dựng cơ sở dữ liệu
-
-1. Sao chép `.env.example` đến `.env`:
+1. Sao chép `.env.example` thành `.env`:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Chỉnh sửa tệp `.env` và thay thế `root:password` với mật khẩu gốc MariaDB của bạn và thay đổi `JWT_SECRET`.
+2. Chỉnh sửa `.env` và cấu hình cài đặt của bạn:
+    - Đặt `DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"` (thay `password` bằng mật khẩu PostgreSQL của bạn)
+    - Đặt `JWT_SECRET` thành một chuỗi ký tự ngẫu nhiên dài
 
 > [CẢNH BÁO ⚠️]
-> Thay thế các kí tự đặc biệt được liệt kê trong bảng sau: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
+> Nếu dùng ký tự đặc biệt trong biến môi trường, hãy mã hóa theo bảng: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
 
 ---
 
-## 6. Thiết lập Prisma và cơ sở dữ liệu
+## 4. Build và khởi tạo
 
 ```powershell
-npm run db:generate
-npm run setup
+cd backend-rs
+cargo run --release -- setup          # migration + người dùng hệ thống
+cargo run --release -- import-geonames cities1000.zip
 ```
+
+Dữ liệu khu vực GeoNames (`cities500.zip` nhỏ nhất, `cities1000.zip`, `cities5000.zip`, `allCountries.zip` lớn nhất) có thể tải từ [download.geonames.org](https://download.geonames.org/export/dump/). Bộ nhập chấp nhận cả `.zip` lẫn TSV thô.
 
 ---
 
-## 7.A Chạy riêng đối với mỗi máy chủ
+## 5. Chạy máy chủ
 
-chạy frontend trong một terminal: 
 ```powershell
-npm run dev
+$env:DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+cargo run --release -- serve          # HTTP API trên BACKEND_PORT (mặc định 3000)
 ```
-chạy caddy trong terminal thứ hai:
+
+> [LƯU Ý]
+> Máy chủ phục vụ thư mục `frontend/` (git submodule) dưới dạng file tĩnh, phân giải qua `FRONTEND_DIR` (mặc định `./frontend`) **tính theo thư mục làm việc hiện tại**. Khi chạy binary từ `backend-rs/`, hãy đặt:
+
 ```powershell
-caddy run --config .\Caddyfile
+$env:FRONTEND_DIR="../frontend"
 ```
+
+> [MẸO]
+> `setup`, `import-geonames`, `serve` và các lệnh khác là subcommand của binary `openplace-backend` duy nhất — tham khảo đầy đủ nằm trong [README](README.md).
 
 ---
 
-## 7.B Chạy cả hai trong một terminal
+## Truy cập máy chủ của bạn
 
-```cmd
-npm run exec
-```
-
-## 7.C Chạy Caddy trong nền và node ra trước
-
-```
-pm2 start ecosystem.config.cjs
-pm2 save
-```
-
-
----
-
-## Khởi động máy chủ của bạn
-
-- Đối với production, thiết lập một chứng chỉ SSL.  
-- Đối với sử dụng cục bộ/riêng tư, truy cập đến:
+- Đối với production, hãy cấu hình chứng chỉ SSL (ví dụ với [Caddy](https://caddyserver.com/) làm reverse proxy).
+- Đối với sử dụng cục bộ/riêng tư, điều hướng đến:
 
 ```
 https://{your-local-IP}:8080
 ```
 
 > [CẢNH BÁO ⚠️]
-> ⚠️ **Quan trọng:** openplace chỉ hoạt động đối với HTTPS. nếu bạn truy cập qua HTTP, bạn sẽ bị **400 Bad Request**.
-
+> **Quan trọng:** openplace chỉ hoạt động qua HTTPS. Nếu bạn truy cập qua HTTP, bạn sẽ nhận **400 Bad Request**.
 
 ---
 
 ## Cập nhật cơ sở dữ liệu
 
-Nếu sơ đồi có sự thay đổi, hãy chạy:
+Nếu schema thay đổi, chạy lại migration:
 
 ```powershell
-npm run db:push
+cargo run --release -- setup
 ```

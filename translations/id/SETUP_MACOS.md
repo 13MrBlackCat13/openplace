@@ -1,98 +1,115 @@
-# openplace — Panduan Pengaturan MacOS
+# openplace — Panduan Pengaturan macOS
 
 Panduan ini akan membantu Anda menyiapkan **macOS** untuk menjalankan **openplace**.
 
 ---
 
 ## Langkah 1: Instal Persyaratan
+
 Pastikan Anda telah menginstal hal-hal berikut pada sistem Anda:
-- **Homebrew**
-- **Node.js**
-- **Git**
+-   **Homebrew**
+-   **Git**
+-   **Rust** (via rustup)
+
+```bash
+brew install git
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+-   **PostgreSQL 15+** (disarankan 17) — install secara lokal:
+
+```bash
+brew install postgresql@17
+brew services start postgresql@17
+createdb openplace
+```
+
+    atau jalankan lewat Docker:
+
+```bash
+docker run -d --name openplace-pg -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
+```
 
 ---
 
 ## Langkah 2: Clone Repositorynya
+
 ```bash
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
----
-
-## Langkah 3: Instal dependensinya
-```bash
-npm i && brew install mariadb caddy nss
-```
-Jika brew tidak secara otomatis memulai layanan, jalankan:
-```bash
-brew services start mariadb
-brew services start caddy
-```
+Opsi `--recurse-submodules` penting: frontend Nuxt disertakan sebagai submodule git.
 
 ---
 
-## Langkah 4: Atur dan bangun Databasenya
+## Langkah 3: Atur environment
 
-Jalankan skrip instalasi aman untuk MySQL:
-```bash
-sudo mysql_secure_installation
-```
-
-Ikuti petunjuk berikut:
-1. Tekan **Enter** untuk memasukkan kata sandi root saat ini.
-2. Masukkan **`n`** saat diminta untuk beralih ke otentikasi unix_socket.
-3. Masukkan **`y`** saat diminta untuk mengubah kata sandi root Anda.  
-   ⚠️ Jangan gunakan "password" seperti yang ditampilkan dalam demo ini.
-4. Masukkan **`y`** untuk menghapus pengguna anonim.  
-5. Pilih apakah akan melarang login root jarak jauh (**disarankan: y**).  
-6. Masukkan **`y`** untuk menghapus basis data uji.  
-7. Masukkan **`y`** untuk memuat ulang konfigurasi.
-
-Selanjutnya, Konfigurasikan lingkungannya:
 ```bash
 cp .env.example .env
 ```
-Update file `.env` dengan password MySQL yang sudah diatur sebelumnya.
+
+Edit `.env` dan atur minimal:
+-   `DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"` (sesuaikan dengan pengaturan PostgreSQL Anda)
+-   `JWT_SECRET` ke string acak yang panjang
+
+> [PERINGATAN ⚠️]
+> Gunakan password yang kuat. Jika password mengandung karakter khusus, ganti karakter tersebut sesuai tabel ini: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
 
 ---
 
-## Langkah 5: Atur Databasenya
+## Langkah 4: Build dan siapkan database
 
-Jalankan perintah Prisma berikut ini:
+Semua perintah berikut dijalankan dari folder `backend-rs`:
+
 ```bash
-npm run db:generate
-npm run setup
+cd backend-rs
+cargo run --release -- setup
+```
+
+Perintah `setup` menerapkan migrasi dan membuat pengguna sistem. Jalankan sekali — aman untuk dijalankan ulang.
+
+Impor data wilayah GeoNames (unduh salah satu dari `cities500.zip`, `cities1000.zip`, `cities5000.zip` atau `allCountries.zip`):
+
+```bash
+cargo run --release -- import-geonames cities1000.zip
 ```
 
 ---
 
-## Langkah 6: Jalankan Aplikasinya
+## Langkah 5: Jalankan servernya
 
-Mulai server dev:
 ```bash
-npm run dev
+export FRONTEND_DIR="../frontend"
+export DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+cargo run --release -- serve
 ```
 
-Di terminal lain, jalankan Caddy:
-```bash
-caddy run --config Caddyfile
-```
+> [CATATAN]
+> `FRONTEND_DIR` (bawaan `./frontend`) diselesaikan **relatif terhadap direktori kerja tempat binary dijalankan**. Karena Anda menjalankan dari `backend-rs/`, atur `FRONTEND_DIR=../frontend`.
+
+API mendengarkan di `BACKEND_PORT` (bawaan `3000`); frontend Nuxt di `127.0.0.1:3001`.
 
 ---
 
 ## Catatan untuk SSL
-openplace **membutuhkan HTTPS**.  
-Jika Anda melakukan pengujian secara lokal, Anda dapat mengakses aplikasinya di:
+
+Untuk produksi, konfigurasikan sertifikat SSL dan reverse proxy (misalnya Caddy) — openplace harus dihosting melalui HTTPS.
+Untuk pengujian lokal, buka:
+
 ```
-https://{IP}:8080
+http://localhost:3000
 ```
-⚠️ Mencobanya dengan menggunakan HTTP justru akan membuat error HTTP 400..
 
 ---
 
-## Memperbarui Database
-Jika skema database berubah, perbarui dengan:
+## Memperbarui Aplikasi
+
+Tarik perubahan terbaru dan jalankan kembali:
+
 ```bash
-npm run db:push
+git pull --recurse-submodules
+cd backend-rs
+cargo run --release -- setup   # menerapkan migrasi baru
+cargo run --release -- serve
 ```

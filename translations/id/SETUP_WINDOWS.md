@@ -6,59 +6,41 @@ Panduan ini akan membantu Anda menyiapkan **Windows** untuk menjalankan **openpl
 
 ## 1. Prasyarat Instal
 
-Anda butuh **Node.js**, **Git**, **MariaDB**, **Caddy**.
+Anda butuh **Rust**, **Git**, dan **PostgreSQL 15+** (disarankan 17).
 
-- Memakai **winget** (Windows 10/11 PowerShell sebagai Administrator):
+-   Install **Rust** melalui rustup (PowerShell):
+
+```powershell
+winget install Rustlang.Rustup
+rustup default stable
+```
+
+-   Install **Git**:
 
 ```powershell
 winget install Git.Git
-winget install OpenJS.NodeJS.LTS
-winget install CaddyServer.Caddy
-winget install nssm
 ```
 
-- Memakai **Chocolatey** (cmd sebagai Administrator):
+-   **PostgreSQL**: install secara lokal (versi 15+, disarankan 17) atau jalankan lewat Docker:
 
-```cmd
-choco install git nodejs-lts caddy nssm -y
+```powershell
+docker run -d --name openplace-pg -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
 ```
 
-- Download MariaDB Server via link ini: [MariaDB Server](https://mirror.mva-n.net/mariadb///mariadb-12.0.2/winx64-packages/mariadb-12.0.2-winx64.msi)
-- Jalankan Installernya
-- Atur root password dan biarkan semua pengaturan tetap default
-  
 ---
 
 ## 2. Clone repositorynya
 
 ```powershell
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
----
-
-## 3. Install dependensi Node
-
-```powershell
-npm install
-npm install -g pm2
-```
+Opsi `--recurse-submodules` penting: frontend Nuxt disertakan sebagai submodule git.
 
 ---
 
-## 4. Stop servis Caddy (Diperlukan jika diinstal sebagai layanan)
-
-- Jika Caddy sudah terinstal sebagai servis, stop via **Services.msc**  
-- Atau secara manual:
-
-```powershell
-net stop caddy
-```
-
----
-
-## 5. Konfigurasikan dan bangun database
+## 3. Konfigurasikan environment
 
 1. Salin `.env.example` ke `.env`:
 
@@ -66,70 +48,70 @@ net stop caddy
 Copy-Item .env.example .env
 ```
 
-Edit `.env` dan timpa `root:password` dengan root password MariaDB mu dan ubah `JWT_SECRET`nya.
+2. Edit `.env` dan atur minimal:
+    - `DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"` (sesuaikan dengan pengaturan PostgreSQL Anda)
+    - `JWT_SECRET` ke string acak yang panjang
 
-> [PEEINGATAN ⚠️]
-> Ganti karakter khusus yang tercantum dari tabel ini: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
-
----
-
-## 6. Setup Prisma dan database
-
-```powershell
-npm run db:generate
-npm run setup
-```
+> [PERINGATAN ⚠️]
+> Gunakan password yang kuat. Jika password mengandung karakter khusus, ganti karakter tersebut sesuai tabel ini: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
 
 ---
 
-## 7.A Jalankan setiap server secara terpisah.
+## 4. Build dan siapkan database
 
-jalankan frontend dalam satu terminal: 
+Semua perintah berikut dijalankan dari folder `backend-rs`:
+
 ```powershell
-npm run dev
+cd backend-rs
+cargo run --release -- setup
 ```
-jalankan caddy dalam terminal kedua:
+
+Perintah `setup` menerapkan migrasi dan membuat pengguna sistem. Jalankan sekali — aman untuk dijalankan ulang.
+
+Impor data wilayah GeoNames (unduh salah satu dari `cities500.zip`, `cities1000.zip`, `cities5000.zip` atau `allCountries.zip`):
+
 ```powershell
-caddy run --config .\Caddyfile
+cargo run --release -- import-geonames cities1000.zip
 ```
 
 ---
 
-## 7.B Jalankan keduanya dalam satu terminal
+## 5. Jalankan servernya
 
-```cmd
-npm run exec
+```powershell
+$env:FRONTEND_DIR="../frontend"
+$env:DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+cargo run --release -- serve
 ```
 
-## 7.C Jalankan Caddy di latar belakang dan node di latar depan
+> [CATATAN]
+> Server menyajikan frontend dari `frontend/` sebagai berkas statis, diselesaikan melalui `FRONTEND_DIR` (bawaan `./frontend`) **relatif terhadap direktori kerja**. Karena binary dijalankan dari `backend-rs/`, atur `FRONTEND_DIR=../frontend` sebelum memulai.
 
-```
-pm2 start ecosystem.config.cjs
-pm2 save
-```
-
+API mendengarkan di `BACKEND_PORT` (bawaan `3000`); frontend Nuxt di `127.0.0.1:3001`.
 
 ---
 
 ## Mengaktifkan server Anda
 
-- Untuk production, konfigurasikan sertifikat SSL.
-- Untuk penggunaan lokal/pribadi, navigasikan ke:
+-   Untuk produksi, konfigurasikan sertifikat SSL dan reverse proxy (misalnya Caddy).
+-   Untuk penggunaan lokal/pribadi, buka:
 
 ```
-https://{your-local-IP}:8080
+http://localhost:3000
 ```
 
 > [PERINGATAN ⚠️]
-> ⚠️ **Penting:** openplace hanya berfungsi melalui HTTPS. Jika Anda mencoba menggunakan HTTP, Anda akan mendapatkan **400 Bad Request**.
-
+> Untuk penggunaan produksi, openplace harus dihosting melalui HTTPS.
 
 ---
 
-## Memperbarui database Anda
+## Memperbarui aplikasi
 
-Jika skema berubah, jalankan:
+Tarik perubahan terbaru dan jalankan kembali:
 
 ```powershell
-npm run db:push
+git pull --recurse-submodules
+cd backend-rs
+cargo run --release -- setup   # menerapkan migrasi baru
+cargo run --release -- serve
 ```

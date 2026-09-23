@@ -1,138 +1,112 @@
 # openplace — Guide d’installation Windows
 
-Ce guide vous aidera à préparer une machine **Windows** pour exécuter **openplace**.
+Ce guide vous aide à compiler et exécuter **openplace** (backend Rust + PostgreSQL) depuis les sources sous **Windows**.
 
 ---
 
 ## 1. Installer les prérequis
 
-Vous aurez besoin de **Node.js**, **Git**, **MariaDB**, et **Caddy**.
+Vous aurez besoin de **Rust 1.85+**, **Git** et **PostgreSQL 15+** (17 recommandé).
 
-- Avec **winget** (sous Windows 10/11, PowerShell en tant qu’administrateur) :
+- Avec **winget** (Windows 10/11, PowerShell en tant qu’administrateur) :
 
 ```powershell
 winget install Git.Git
-winget install OpenJS.NodeJS.LTS
-winget install CaddyServer.Caddy
-winget install nssm
-````
-
-* Avec **Chocolatey** (cmd en tant qu’administrateur) :
-
-```cmd
-choco install git nodejs-lts caddy nssm -y
+winget install Rustlang.Rustup
 ```
 
-* Téléchargez le serveur MariaDB via ce lien : [MariaDB Server](https://mirror.mva-n.net/mariadb///mariadb-12.0.2/winx64-packages/mariadb-12.0.2-winx64.msi)
-* Exécutez l’installateur
-* Définissez un mot de passe root et laissez les autres options par défaut
+Vous pouvez aussi installer Rust via [rustup.rs](https://rustup.rs/) (`rustup-init.exe` ; le composant « Desktop development with C++ » de Visual Studio Build Tools est requis).
+
+- **PostgreSQL** : installez-le depuis [postgresql.org](https://www.postgresql.org/download/windows/), ou lancez-le simplement avec Docker :
+
+```powershell
+docker run -d --name openplace-pg -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
+```
 
 ---
 
 ## 2. Cloner le dépôt
 
 ```powershell
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
 ---
 
-## 3. Installer les dépendances Node
+## 3. Créer la base de données
+
+Avec une installation native de PostgreSQL (le mot de passe défini lors de l’installation vous sera demandé) :
 
 ```powershell
-npm install
-npm install -g pm2
+createdb -U postgres openplace
 ```
+
+Si vous utilisez le conteneur Docker ci-dessus, la base `openplace` est déjà créée — passez à l’étape suivante.
 
 ---
 
-## 4. Arrêter les services Caddy (si installés comme service)
-
-* Si Caddy a été installé en tant que service, arrêtez-le via **Services.msc**
-* Ou manuellement :
-
-```powershell
-net stop caddy
-```
-
----
-
-## 5. Configurer et initialiser la base de données
-
-1. Copiez `.env.example` vers `.env` :
+## 4. Configurer l’environnement
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Modifiez `.env` et remplacez `root:password` par le mot de passe root de votre base MariaDB, puis changez la valeur de `JWT_SECRET`.
+Modifiez le fichier `.env` et définissez au minimum :
 
-> [AVERTISSEMENT ⚠️]
-> Échappez les caractères spéciaux listés dans ce tableau : [Encodage pourcentuel](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
+- `DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"`
+- `JWT_SECRET` — une longue chaîne aléatoire sécurisée
 
----
-
-## 6. Configurer Prisma et la base de données
+Vous pouvez aussi (ou en complément) définir ces variables dans la session PowerShell courante :
 
 ```powershell
-npm run db:generate
-npm run setup
-```
-
----
-
-## 7.A Exécuter chaque serveur séparément
-
-Lancez le frontend dans un terminal :
-
-```powershell
-npm run dev
-```
-
-Lancez Caddy dans un second terminal :
-
-```powershell
-caddy run --config .\Caddyfile
-```
-
----
-
-## 7.B Exécuter les deux dans un seul terminal
-
-```cmd
-npm run exec
-```
-
----
-
-## 7.C Exécuter Caddy en arrière-plan et Node au premier plan
-
-```powershell
-pm2 start ecosystem.config.cjs
-pm2 save
-```
-
----
-
-## Démarrer votre serveur
-
-* En production, configurez un certificat SSL.
-* Pour un usage local ou privé, accédez à :
-
-```
-https://{votre-IP-locale}:8080
+$env:DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+$env:JWT_SECRET="une-longue-chaine-aleatoire-securisee"
 ```
 
 > [AVERTISSEMENT ⚠️]
-> ⚠️ **Important :** openplace ne fonctionne qu’en HTTPS. Si vous essayez en HTTP, vous obtiendrez une **erreur 400 Bad Request**.
+> N’utilisez jamais le mot de passe d’exemple `password` ni un secret faible en production.
+
+---
+
+## 5. Compiler, initialiser et lancer
+
+Le backend se compile et se lance depuis le dossier `backend-rs` :
+
+```powershell
+cd backend-rs
+
+cargo run --release -- setup                            # migrations + utilisateurs système
+cargo run --release -- import-geonames cities1000.zip   # données de régions (voir le README)
+
+$env:FRONTEND_DIR="../frontend"   # voir la remarque ci-dessous
+cargo run --release -- serve      # API HTTP sur BACKEND_PORT (3000 par défaut)
+```
+
+> [REMARQUE]
+> Le serveur sert le dossier `frontend/` (le sous-module git) comme fichiers statiques, résolu via `FRONTEND_DIR` (`./frontend` par défaut) **par rapport au répertoire de travail depuis lequel il est lancé**. Comme ici le binaire est lancé depuis `backend-rs/`, il faut définir `FRONTEND_DIR=../frontend`.
+
+> [ASTUCE]
+> `setup`, `import-geonames` et `serve` sont des sous-commandes du binaire unique `openplace-backend` — voir la [Référence des commandes](LISEZMOI.md#référence-des-commandes).
+
+---
+
+## 6. Accéder à l’application
+
+- **API** : `http://127.0.0.1:3000`
+- Le backend sert aussi les fichiers statiques du frontend (`frontend/`) sur le même port.
+
+Pour un accès public, placez [Caddy](https://caddyserver.com/) (ou un autre proxy inverse) devant le backend pour obtenir le HTTPS.
+
+> [AVERTISSEMENT ⚠️]
+> En production, configurez un certificat SSL : openplace doit être servi en HTTPS. Pour un usage local ou privé, `http://127.0.0.1:3000` suffit.
 
 ---
 
 ## Mettre à jour la base de données
 
-Si le schéma change, exécutez :
+Si le schéma change après une mise à jour du dépôt, réappliquez les migrations :
 
 ```powershell
-npm run db:push
+cargo run --release -- setup
 ```

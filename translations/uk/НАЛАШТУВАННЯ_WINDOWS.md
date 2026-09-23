@@ -1,135 +1,81 @@
-# openplace — Гайд з налаштування Windows
+# openplace — Гайд налаштування Windows
 
-Цей гайд допоможе вам підготувати ваш девайс з **Windows** до запуску **openplace**.
+Цей гайд допоможе вам підготувати пристрій з **Windows** до запуску **openplace** з вихідного коду.
 
 ---
 
 ## 1. Встановіть необхідні компоненти
 
-Вам потрібні **Node.js**, **Git**, **MariaDB**, **Caddy**.
-
-- Використання **winget** (Windows 10/11, запустіть PowerShell від імені адміністратора):
+-   **Rust** 1.85+ — встановіть через [rustup](https://rustup.rs/) (PowerShell):
 
 ```powershell
-winget install Git.Git
-winget install OpenJS.NodeJS.LTS
-winget install CaddyServer.Caddy
-winget install nssm
+winget install Rustlang.Rustup
 ```
 
-- Використання **Chocolatey** (cmd від імені адміністратора):
+Або завантажте `rustup-init.exe` зі сторінки [rustup.rs](https://rustup.rs/) і запустіть його.
 
-```cmd
-choco install git nodejs-lts caddy nssm -y
+-   **PostgreSQL** 15+ (рекомендовано 17): [postgresql.org/download/windows](https://www.postgresql.org/download/windows/) — під час встановлення задайте пароль користувача `postgres`
+-   **Git**: [git-scm.com](https://git-scm.com/download/win)
+
+Альтернатива локальному PostgreSQL — Docker:
+
+```powershell
+docker run -d --name openplace-pg -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
 ```
-
-- Завантажте MariaDB Server за цим посиланням: [MariaDB Server](https://mirror.mva-n.net/mariadb///mariadb-12.0.2/winx64-packages/mariadb-12.0.2-winx64.msi)
-- Запустіть інсталятор
-- Встановіть пароль root і залиште всі налаштування за замовчуванням
 
 ---
 
-## 2. Клонувати репозиторій
+## 2. Клонуйте репозиторій
 
 ```powershell
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
 ---
 
-## 3. Встановіть залежності Node
+## 3. Налаштуйте середовище
 
-```powershell
-npm install
-npm install -g pm2
-```
-
----
-
-## 4. Зупиніть служби Caddy (необхідно, якщо Caddy встановлено як службу)
-
-- Якщо Caddy встановлено як службу, зупиніть його за допомогою **Services.msc**  
-- Або вручну:
-
-```powershell
-net stop caddy
-```
-
----
-
-## 5. Налаштування та створення бази даних
-
-1. Скопіюйте `.env.example` та переменуйте на `.env`:
+Скопіюйте `.env.example` під назвою `.env`:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Відредагуйте `.env` і замініть `root:password` на ваш пароль root MariaDB та змініть `JWT_SECRET`.
+Відредагуйте `.env` та задайте `DATABASE_URL` і `JWT_SECRET` (довгий випадковий рядок). Або задайте змінні в поточній сесії PowerShell:
+
+```powershell
+$env:DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+$env:JWT_SECRET="довгий-випадковий-рядок"
+```
 
 > [ПОПЕРЕДЖЕННЯ ⚠️]
-> Екрануйте спеціальні символи, наведені в цій таблиці: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
+> Якщо ви вказуєте пароль у `DATABASE_URL`, екрануйте спеціальні символи, наведені в цій таблиці: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
 
 ---
 
-## 6. Налаштування Prisma та бази даних
+## 4. Ініціалізуйте базу даних і запустіть сервер
 
 ```powershell
-npm run db:generate
-npm run setup
+cd backend-rs
+cargo run --release -- setup                # міграції + системні користувачі
+cargo run --release -- import-geonames cities1000.zip
+cargo run --release -- serve                # HTTP API на BACKEND_PORT (за замовчуванням 3000)
 ```
 
----
+> [ПРИМІТКА]
+> Сервер роздає каталог `frontend/` (git-субмодуль) як статичні файли, визначаючи його через `FRONTEND_DIR` (за замовчуванням `./frontend`) **відносно робочого каталогу, з якого його запущено**. Оскільки ви запускаєте бінарник з `backend-rs/`, задайте `FRONTEND_DIR=../frontend`.
 
-## 7.A Запустіть кожен сервер окремо
-
-запустіть frontend в одному терміналі: 
-```powershell
-npm run dev
-```
-запустіть caddy в другому терміналі:
-```powershell
-caddy run --config .\Caddyfile
-```
-
----
-
-## 7.B Запустіть обидва в одному терміналі
-
-```cmd
-npm run exec
-```
-
-## 7.C Запустіть Caddy у фоновому режимі, а node — у фоновому
-
-```
-pm2 start ecosystem.config.cjs
-pm2 save
-```
-
+> [ПОРАДА]
+> Без даних регіонів бекенд теж працює, але кожен піксель потрапляє до резервного регіону. Дампи міст доступні на [download.geonames.org](https://download.geonames.org/export/dump/).
 
 ---
 
 ## Запуск сервера
 
-- Для публіки/продакшн налаштуйте SSL-сертифікат.  
-- Для локального/приватного використання перейдіть за адресою:
+-   Для публіки/продакшн налаштуйте SSL-сертифікат (наприклад, поставте Caddy як зворотний проксі).
+-   Для локального/приватного використання відкрийте:
 
 ```
-https://{your-local-IP}:8080
-```
-
-> [ПОПЕРЕДЖЕННЯ ⚠️]
-> ⚠️ **Важливо:** OpenPlace працює тільки через HTTPS. Якщо ви спробуєте HTTP, ви отримаєте **400 Bad Request**.
-
-
----
-
-## Оновлення бази даних
-
-Якщо схема бази даних змінюється, запустіть:
-
-```powershell
-npm run db:push
+http://localhost:3000
 ```

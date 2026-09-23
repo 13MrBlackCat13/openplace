@@ -1,98 +1,95 @@
-# Гайд налаштування для openplace (macOS)
+# openplace — Гайд налаштування для macOS
 
-Цей гайд допоможе вам підготувати ваш девайс з **macOS** до запуску **openplace**.
+Цей гайд допоможе вам підготувати пристрій з **macOS** до запуску **openplace** з вихідного коду.
 
 ---
 
 ## Крок 1: Встановіть необхідні компоненти
-Перевірте чи є у вас оці наступні компоненти на вашій системі:
-- **Homebrew**
-- **Node.js**
-- **Git**
+
+Перевірте, чи є на вашій системі:
+
+-   **Homebrew** — [brew.sh](https://brew.sh/)
+-   **Git** — `xcode-select --install` або [git-scm.com](https://git-scm.com/download/mac)
+
+Встановіть **Rust** 1.85+ через [rustup](https://rustup.rs/):
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
 ---
 
-## Крок 2: Клонувати репозиторій
+## Крок 2: Клонуйте репозиторій
+
 ```bash
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
 ```
 
 ---
 
-## Step 3: Встановити залежності
+## Крок 3: Підготуйте базу даних PostgreSQL
+
+### Варіант A: PostgreSQL через Homebrew
+
 ```bash
-npm i && brew install mariadb caddy nss
+brew install postgresql@17
+brew services start postgresql@17
+createdb openplace
 ```
-Якщо brew автомтаично не стартував сервсі - виконайте це:
+
+### Варіант B: PostgreSQL через Docker
+
 ```bash
-brew services start mariadb
-brew services start caddy
+docker run -d --name openplace-pg \
+  -e POSTGRES_DB=openplace -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:17-alpine
 ```
 
 ---
 
-## Крок 4: Конфігурація та створення бази даних
+## Крок 4: Налаштуйте середовище
 
-Запустіть скрипт безпечної інсталяції для MySQL:
-```bash
-sudo mysql_secure_installation
-```
+Скопіюйте `.env.example` під назвою `.env`:
 
-Дотримуйтесь вказівок:
-1. Натисніть **Enter** для введення поточного пароля root.
-2. Введіть **`n`**, коли з'явиться запит на перехід до аутентифікації unix_socket.
-3. Введіть **`y`**, коли з'явиться запит на зміну пароля root.  
-   ⚠️ **Не** використовуйте «password», як показано в цьому демо.
-4. Введіть **`y`**, щоб видалити анонімних користувачів.
-5. Виберіть, чи забороняти віддалений вхід root (**рекомендовано: y**).
-6. Введіть **`y`**, щоб видалити тестову базу даних.
-7. Введіть **`y`**, щоб перезавантажити конфігурацію.
-
-Потім налаштуйте середовище:
 ```bash
 cp .env.example .env
 ```
-Оновіть у `.env` файлі ваш пароль від MySQL.
+
+Відредагуйте `.env` та задайте `DATABASE_URL` і `JWT_SECRET` (довгий випадковий рядок). Або задайте змінні в поточній сесії терміналу:
+
+```bash
+export DATABASE_URL="postgres://postgres:password@localhost:5432/openplace"
+export JWT_SECRET="довгий-випадковий-рядок"
+```
+
+> [ПОПЕРЕДЖЕННЯ ⚠️]
+> Якщо ви вказуєте пароль у `DATABASE_URL`, екрануйте спеціальні символи, наведені в цій таблиці: [Percent-Encoding](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
 
 ---
 
-## Крок 5: Налаштування бази даних
+## Крок 5: Ініціалізуйте базу даних і запустіть сервер
 
-Виконайте наступні Prisma команди:
 ```bash
-npm run db:generate
-npm run setup
+cd backend-rs
+cargo run --release -- setup            # міграції + системні користувачі
+cargo run --release -- import-geonames cities1000.zip
+cargo run --release -- serve            # HTTP API на BACKEND_PORT (за замовчуванням 3000)
 ```
+
+> [ПРИМІТКА]
+> Сервер роздає каталог `frontend/` (git-субмодуль) як статичні файли, визначаючи його через `FRONTEND_DIR` (за замовчуванням `./frontend`) **відносно робочого каталогу, з якого його запущено**. Оскільки ви запускаєте бінарник з `backend-rs/`, задайте `FRONTEND_DIR=../frontend`.
+
+> [ПОРАДА]
+> Без даних регіонів бекенд теж працює, але кожен піксель потрапляє до резервного регіону. Дампи міст доступні на [download.geonames.org](https://download.geonames.org/export/dump/).
 
 ---
 
-## Крок 6: Запустити застосунок
+## Запуск сервера
 
-Запустіть сервер розробки:
-```bash
-npm run dev
+-   Для публіки/продакшн налаштуйте SSL-сертифікат (наприклад, поставте Caddy як зворотний проксі).
+-   Для локального/приватного використання відкрийте:
+
 ```
-
-У іншому терміналі запустіть Caddy:
-```bash
-caddy run --config Caddyfile
-```
-
----
-
-## Примітки щодо SSL
-OpenPlace **потребує HTTPS**.  
-Якщо ви тестуєте локально, ви можете отримати доступ до програми за адресою:
-```
-https://{IP}:8080
-```
-⚠️ Спроба використання HTTP призведе до **помилки HTTP 400**.
-
----
-
-## Оновлення бази даних
-Якщо схема бази даних змінюється, оновіть її за допомогою:
-```bash
-npm run db:push
+http://localhost:3000
 ```

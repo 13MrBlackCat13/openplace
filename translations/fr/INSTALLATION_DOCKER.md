@@ -1,61 +1,87 @@
 # openplace — Guide d’installation avec Docker
 
-Ce guide vous aidera à exécuter **openplace** avec Docker.
+Ce guide vous aide à exécuter **openplace** (backend Rust + PostgreSQL 17) avec Docker.
 
 ## Prérequis
 
-Vous devez avoir **Docker** et **Docker Compose** installés sur votre système.
+Vous devez avoir **Docker** avec **Compose v2** (la commande `docker compose`) installé sur votre système.
 
-### Installer Docker
+- **Windows / macOS** : téléchargez Docker Desktop depuis [docker.com](https://www.docker.com/products/docker-desktop/) (Compose v2 est inclus)
+- **Linux** : installez le moteur Docker depuis [docs.docker.com](https://docs.docker.com/engine/install/), puis le plugin Compose depuis [docs.docker.com/compose/install](https://docs.docker.com/compose/install/linux/)
 
--   **Windows** : Téléchargez Docker Desktop depuis [docker.com](https://www.docker.com/products/docker-desktop/)
--   **macOS** : Téléchargez Docker Desktop depuis [docker.com](https://www.docker.com/products/docker-desktop/)
--   **Linux** : Suivez le guide d’installation correspondant à votre distribution sur [docs.docker.com](https://docs.docker.com/engine/install/)
+Vérifiez votre installation :
+
+```bash
+docker compose version
+```
 
 ## 1. Cloner le dépôt
 
+Clonez le dépôt **avec le sous-module du frontend** :
+
 ```bash
-git clone --recurse-submodules https://github.com/openplaceteam/openplace
+git clone --recurse-submodules https://github.com/13MrBlackCat13/openplace.git
 cd openplace
-````
+```
 
 ## 2. Configurer l’environnement
 
-1. Copiez le fichier `.env.example` vers `.env` :
+Copiez le fichier d’exemple :
 
 ```bash
 cp .env.example .env
 ```
 
-2. Modifiez le fichier `.env` et configurez vos paramètres :
+Modifiez ensuite le fichier `.env` :
 
-   * Définissez votre `JWT_SECRET` (générez une chaîne aléatoire sécurisée)
-   * Définissez votre `DATABASE_URL` sur `"mysql://root:password@db/openplace"`
-   * Le mot de passe root de MariaDB est défini sur `password` (modifiez-le si nécessaire)
+- définissez `JWT_SECRET` avec une longue chaîne aléatoire sécurisée (**obligatoire**) ;
+- `DATABASE_URL` est déjà fourni par le `docker-compose.yml` (service `db`, utilisateur `postgres`, mot de passe `password` — changez-le dans le compose si besoin) ;
+- ajustez les autres variables selon vos besoins (voir la section [Configuration](LISEZMOI.md#configuration) du README).
 
-> [AVERTISSEMENT ⚠️]
-> Échappez les caractères spéciaux listés dans ce tableau : [Encodage pourcentuel](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding)
+## 3. Démarrer la pile
 
-## 3. Démarrer l’application
-
-Lancez l’ensemble de la pile avec Docker Compose :
+Lancez l’ensemble des services avec Compose v2 :
 
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
 
-Cela démarrera :
+Cela démarre quatre services :
 
-* **Base de données MariaDB** sur le port 3306
-* **Application Node.js** (backend)
-* **Proxy inverse Caddy** sur le port 443
+- **db** — PostgreSQL 17, avec healthcheck ;
+- **app** — le backend openplace (binaire Rust unique, healthcheck intégré) ;
+- **caddy** — proxy inverse et TLS sur les ports **80** et **443** ; il attend que `app` soit en bonne santé (`condition: service_healthy`) avant de proxifier ;
+- **frontend2** — le frontend Nuxt, publié sur `127.0.0.1:3001`.
 
-## 4. Accéder à l’application
+## 4. Initialiser la base de données
 
-Une fois tous les services en cours d’exécution, vous pouvez accéder à openplace à l’adresse :
+Une fois les conteneurs démarrés, créez les tables et les utilisateurs système :
 
+```bash
+docker compose exec app openplace-backend setup
 ```
-http://localhost
-https://localhost
+
+Importez ensuite les données de régions GeoNames (téléchargez par exemple `cities1000.zip` sur [download.geonames.org](https://download.geonames.org/export/dump/)) :
+
+```bash
+docker compose exec app openplace-backend import-geonames /chemin/vers/cities1000.zip
 ```
 
+## 5. Accéder à l’application
+
+| Service | Adresse |
+|---|---|
+| API (backend) | port `3000` (derrière Caddy sur `:80`/`:443`) |
+| Proxy inverse Caddy | `http://localhost` / `https://localhost` |
+| Frontend Nuxt (`frontend2`) | `http://127.0.0.1:3001` |
+
+> [AVERTISSEMENT ⚠️]
+> En production, openplace doit être servi en HTTPS. Dès qu’un nom de domaine pointe vers votre serveur, Caddy obtient et renouvelle automatiquement les certificats ; en local, `https://localhost` fonctionne aussi (Caddy émet un certificat local).
+
+## Mettre à jour
+
+```bash
+git pull --recurse-submodules
+docker compose up -d --build
+docker compose exec app openplace-backend setup   # applique les nouvelles migrations
+```
