@@ -126,16 +126,14 @@ jobs:
     needs: [binaries, docker]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
+      # gh CLI is more reliable than download-artifact@v4 here (parallel
+      # blob redirects intermittently fail after 5 retries).
+      - name: Download all artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download ${{ github.run_id }} --dir dist
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: |
-            dist/*.tar.gz
-            dist/*.tar.gz.sha256
-            dist/*.zip
-            dist/*.zip.sha256
+          files: dist/**/*
