@@ -28,6 +28,9 @@ cargo run --release -- serve
 
 ## Before you open a pull request
 
+A [pull request template](.github/PULL_REQUEST_TEMPLATE.md) will pre-fill your
+description — the checklist below mirrors it.
+
 CI runs on every PR and **all of these must pass**:
 
 ```sh
@@ -50,7 +53,9 @@ Guidelines:
 
 ## Reporting issues
 
-Please use the issue templates. For security-sensitive reports (exploits,
+Please use the issue templates. Everyone participating in this project
+(issues, PRs, Discord) is expected to follow the
+[Code of Conduct](CODE_OF_CONDUCT.md). For security-sensitive reports (exploits,
 account takeover, DoS), prefer contacting the maintainers privately via the
 [Discord server](https://discord.gg/ZRC4DnP9Z2) rather than opening a public
 issue.
