@@ -54,21 +54,21 @@
 <div class="card">
   <h2>Community rules</h2>
   <div class="row"><div class="label"><b>Multi-accounting allowed</b><span>Users may run several accounts on this instance.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_multi_account"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Multi-accounting allowed"><input type="checkbox" id="allow_multi_account"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>Offensive content allowed</b><span>Insults and offensive language are tolerated.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_offensive_content"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Offensive content allowed"><input type="checkbox" id="allow_offensive_content"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>Explicit (18+) content allowed</b><span>Adult content may be drawn on the canvas.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_explicit_content"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Explicit (18+) content allowed"><input type="checkbox" id="allow_explicit_content"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>Griefing allowed</b><span>Deliberately ruining other players' art is permitted.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_griefing"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Griefing allowed"><input type="checkbox" id="allow_griefing"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>Kind griefing allowed</b><span>Friendly, harmless griefing is permitted.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_kind_griefing"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Kind griefing allowed"><input type="checkbox" id="allow_kind_griefing"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>Political griefing allowed</b><span>Political flags and messaging are permitted.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_political_griefing"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Political griefing allowed"><input type="checkbox" id="allow_political_griefing"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>VPNs allowed</b><span>Users behind VPNs and proxies may play.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_vpn"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="VPNs allowed"><input type="checkbox" id="allow_vpn"><span class="slider"></span></label></div>
   <div class="row"><div class="label"><b>Botting allowed</b><span>Automated painting clients are permitted.</span></div>
-    <label class="switch"><input type="checkbox" id="allow_bots"><span class="slider"></span></label></div>
+    <label class="switch" aria-label="Botting allowed"><input type="checkbox" id="allow_bots"><span class="slider"></span></label></div>
   <div class="field">
     <label for="extra_rules">Extra rules (free text shown to users)</label>
     <textarea id="extra_rules" maxlength="2000" placeholder="Anything else users should know about the rules..."></textarea>
@@ -142,7 +142,7 @@
     const extra = $("extra_rules").value;
     body.extra_rules = extra === "" ? null : extra;
     body.anti_bot_mode = $("anti_bot_mode").value;
-    body.anti_bot_enforce_threshold = parseInt($("anti_bot_enforce_threshold").value, 10);
+    body.anti_bot_enforce_threshold = Number.parseInt($("anti_bot_enforce_threshold").value, 10);
     const btn = $("save");
     btn.disabled = true;
     try {
