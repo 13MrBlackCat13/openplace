@@ -42,10 +42,10 @@ jobs:
         with:
           workspaces: backend-rs
       - name: Unit tests
-        run: cargo test --release
+        run: cargo test --release --locked
         working-directory: backend-rs
       - name: Build (release)
-        run: cargo build --release
+        run: cargo build --release --locked
         working-directory: backend-rs
 
   docker:
