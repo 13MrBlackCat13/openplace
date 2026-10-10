@@ -8,8 +8,13 @@ use dashmap::DashMap;
 #[cfg(test)]
 use std::sync::atomic::AtomicUsize;
 
-/// In-memory sliding-window rate limiter, port of src/services/rate-limiter.ts.
-/// Single-process by design (the JS backend is single-process too).
+/// In-memory sliding-window rate limiter. Based on the port of
+/// src/services/rate-limiter.ts, with two deliberate improvements: a true
+/// sliding window (the original fixed window allowed a full-limit burst at
+/// every window rollover) and cleanup that keeps entries with active blocks
+/// (the original silently lifted a block after 5 minutes while the client
+/// was still hammering). Single-process by design (the JS backend is
+/// single-process too).
 pub struct RateLimiter {
     map: DashMap<String, Entry>,
     now_fn: Arc<dyn Fn() -> i64 + Send + Sync>,
